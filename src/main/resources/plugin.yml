@@ -1,0 +1,19 @@
+name: BadgerQuest
+version: ${project.version}
+main: ir.badgerquest.plugin.BadgerQuest
+api-version: '1.21'
+author: BadgerQuest
+description: Daily rotating quest system with per-player randomization and streak rewards.
+softdepend: [PlaceholderAPI]
+commands:
+  quest:
+    description: Open the daily quest menu
+    usage: /quest [reload|reset <player>]
+    aliases: [bq, badgerquest]
+permissions:
+  badgerquest.use:
+    description: Open the quest menu
+    default: true
+  badgerquest.admin:
+    description: Reload config / reset player data
+    default: op

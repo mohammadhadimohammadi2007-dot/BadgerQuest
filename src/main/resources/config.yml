@@ -1,0 +1,295 @@
+# =============================================================================
+#  BadgerQuest — Daily rotating quests with per-player randomization
+# =============================================================================
+
+# How many quests each player gets per day
+quests_per_day: 7
+
+# How many objectives (items to collect) per quest
+items_per_quest: 3
+
+# Server-wide daily reset hour (0-23, server local time)
+# All quest items regenerate at this hour for every player
+reset_hour: 2
+
+# Timezone for the reset hour ("system" = server default, or e.g. "Asia/Tehran")
+timezone: "system"
+
+# =============================================================================
+#  STREAK SYSTEM
+# =============================================================================
+streak:
+  # After this many days of inactivity, streak resets to 0
+  reset_after_days: 7
+
+  # Cap on streak (0 = no cap)
+  max: 30
+
+  # Rewards granted every N-th consecutive day
+  # Each key = day number; commands run from console with %player% placeholder
+  milestone_rewards:
+    3:
+      - "give %player% diamond 1"
+    7:
+      - "give %player% emerald 3"
+      - "broadcast %player% just hit a 7-day quest streak!"
+    14:
+      - "give %player% netherite_ingot 1"
+    30:
+      - "give %player% netherite_block 1"
+
+# =============================================================================
+#  BOSSBAR (shown while player picks up quest items)
+# =============================================================================
+bossbar:
+  enabled: true
+  # How long the bossbar stays visible after the last pickup (seconds)
+  fade_seconds: 4
+  # BossBar color: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
+  color: "YELLOW"
+  # Style: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+  style: "SOLID"
+  # Title format. Placeholders:
+  #   {item}    display name of the item
+  #   {have}    how many the player has already turned in
+  #   {need}    total needed
+  #   {remaining} need - have
+  title: "&e{item} &7— &f{have}&7/&e{need}"
+
+# =============================================================================
+#  ITEM POOL — the possible objectives a player can get randomly assigned
+# =============================================================================
+# Each entry defines one item type players may be asked to collect.
+# `material` is the vanilla Minecraft item.
+# `custom_model_data` matches your resource pack; -1 = ignore CMD.
+# `display_name` is used in bossbar / GUI (accepts & color codes).
+# `min` / `max` = random amount range chosen once per player per day.
+item_pool:
+  - id: "paper"
+    material: PAPER
+    custom_model_data: -1
+    display_name: "&fPaper"
+    min: 8
+    max: 20
+
+  - id: "iron_ingot"
+    material: IRON_INGOT
+    custom_model_data: -1
+    display_name: "&fIron Ingot"
+    min: 5
+    max: 15
+
+  - id: "wheat"
+    material: WHEAT
+    custom_model_data: -1
+    display_name: "&eWheat"
+    min: 10
+    max: 32
+
+  - id: "cobblestone"
+    material: COBBLESTONE
+    custom_model_data: -1
+    display_name: "&7Cobblestone"
+    min: 16
+    max: 64
+
+  - id: "oak_log"
+    material: OAK_LOG
+    custom_model_data: -1
+    display_name: "&6Oak Log"
+    min: 8
+    max: 24
+
+  - id: "coal"
+    material: COAL
+    custom_model_data: -1
+    display_name: "&8Coal"
+    min: 8
+    max: 20
+
+  - id: "bread"
+    material: BREAD
+    custom_model_data: -1
+    display_name: "&fBread"
+    min: 4
+    max: 12
+
+  - id: "raw_beef"
+    material: BEEF
+    custom_model_data: -1
+    display_name: "&cRaw Beef"
+    min: 4
+    max: 10
+
+# =============================================================================
+#  REWARDS PER QUEST (per completed quest of the 7 daily)
+# =============================================================================
+# Runs from console when all 3 items of a quest are turned in.
+# %player% is replaced with the player's name.
+# If a specific quest index (1..quests_per_day) is missing, `default` is used.
+quest_rewards:
+  default:
+    - "eco give %player% 500"
+  # Example overrides:
+  # 7:
+  #   - "eco give %player% 2000"
+  #   - "give %player% diamond 3"
+
+# Reward when ALL quests_per_day are done in one day (in addition to the per-quest reward)
+daily_completion_reward:
+  - "broadcast %player% completed all daily quests!"
+  - "eco give %player% 1500"
+
+# Message templates
+messages:
+  prefix: "&8[&6BadgerQuest&8] "
+  no_permission: "&cYou don't have permission."
+  not_a_player: "&cOnly players can use this."
+  quest_accepted: "&aQuest accepted! Collect the required items."
+  quest_step_completed: "&aObjective complete! &7({have}/{total})"
+  quest_completed: "&6Quest #{index} completed! &7Rewards granted."
+  all_quests_done: "&6&lAll daily quests complete! &7Come back at the next reset."
+  wrong_item: "&cThat item doesn't match this objective."
+  not_enough_space: "&cKeep at least one free inventory slot before turning in."
+  reload_success: "&aConfiguration reloaded."
+  reset_success: "&aReset quest data for &e{player}&a."
+
+# =============================================================================
+#  GUI — 54-slot chest. Fully skinnable via custom_model_data.
+# =============================================================================
+# Slot indexes 0-53 (6 rows × 9 cols). Design any layout you want.
+gui:
+  # Title shown BEFORE the player accepts the quest.
+  title: "&8Badger's Cabin"
+  # Title shown AFTER the player accepts (leave equal to `title` to disable the switch).
+  title_accepted: "&8Badger's Cabin &7— &aACTIVE"
+  size: 54
+
+  # Slots where the player DROPS items to turn them in.
+  # There must be exactly `items_per_quest` slots here.
+  input_slots: [11, 13, 15]
+
+  # Slots that DISPLAY the required item (below each input slot).
+  # Same count as input_slots. display_slots[i] shows the item required by input_slots[i].
+  display_slots: [20, 22, 24]
+
+  # ALL of the button slots below accept EITHER a single int OR a list of ints.
+  # Listing multiple slots renders the same button at each one and lets clicks on any of
+  # them trigger the button — useful for making buttons look "wider".
+
+  # Slot(s) for the Accept button (before the player accepts the quest).
+  accept_slot: [3, 4, 5]
+
+  # Slot(s) where the quest index / progress info is shown.
+  quest_info_slot: 49
+
+  # Streak indicator slot(s).
+  streak_slot: 40
+
+  # Upcoming rewards / info tooltip slot(s).
+  info_slot: 42
+
+  # Close button slot(s).
+  close_slot: 48
+
+  # Slots to leave EMPTY (no filler, no click accepted).
+  empty_slots: []
+
+  # ---- Item skins ---------------------------------------------------------
+  # Every item below uses:
+  #   material            : Bukkit Material name
+  #   custom_model_data   : -1 to skip
+  #   name                : display name (& colors)
+  #   lore                : list of lore lines (& colors, supports placeholders)
+  # Placeholders available in lore:
+  #   {have} {need} {remaining} {item} {index} {total_quests}
+  #   {streak} {highscore} {days_until_reset} {days_until_streak_reset}
+  #   {next_milestone_days} {next_milestone_name}
+  items:
+    filler:
+      material: GRAY_STAINED_GLASS_PANE
+      custom_model_data: -1
+      name: " "
+      lore: []
+
+    accept_button:
+      material: LIME_STAINED_GLASS_PANE
+      custom_model_data: -1
+      name: "&a&lACCEPT"
+      lore:
+        - "&7Click to begin this quest."
+        - "&7You will have &e24 hours &7to finish."
+
+    accepted_marker:
+      material: LIME_DYE
+      custom_model_data: -1
+      name: "&a&lQUEST ACTIVE"
+      lore:
+        - "&7Place matching items in the slots above."
+
+    input_slot_hint:
+      material: LIGHT_GRAY_STAINED_GLASS_PANE
+      custom_model_data: -1
+      name: "&7Place items here"
+      lore:
+        - "&8Only the matching item will be accepted."
+
+    display_progress:
+      material: PAPER  # runtime-overridden with the actual quest item's material+CMD
+      custom_model_data: -1
+      name: "&e{item}"
+      lore:
+        - "&7Progress: &f{have}&7/&e{need}"
+        - "&7Remaining: &f{remaining}"
+
+    display_completed:
+      material: LIME_DYE
+      custom_model_data: -1
+      name: "&a&l✔ Objective Complete"
+      lore:
+        - "&7You've delivered all &e{need} {item}&7."
+
+    quest_info:
+      material: BOOK
+      custom_model_data: -1
+      name: "&6Quest &e{index}&6/&e{total_quests}"
+      lore:
+        - "&7Progress today: &e{completed_today}&7/&e{total_quests}"
+        - ""
+        - "&7Next reset in &e{time_until_reset}"
+
+    close_button:
+      material: BARRIER
+      custom_model_data: -1
+      name: "&cClose"
+      lore: []
+
+    streak_indicator:
+      material: CAMPFIRE
+      custom_model_data: -1
+      name: "&6Streak: &e{streak}"
+      lore:
+        - "&7Highscore: &e{highscore}"
+        - "&7Days until streak resets: &e{days_until_streak_reset}"
+
+    info_indicator:
+      material: CLOCK
+      custom_model_data: -1
+      name: "&eUpcoming Rewards"
+      lore:
+        - "&7Next milestone: &e{next_milestone_name}"
+        - "&7In &e{next_milestone_days} &7days"
+
+    all_done_marker:
+      material: ENCHANTED_GOLDEN_APPLE
+      custom_model_data: -1
+      name: "&6&lALL QUESTS COMPLETE"
+      lore:
+        - "&7Come back at the next reset."
+
+# =============================================================================
+#  DATABASE
+# =============================================================================
+database:
+  # Path relative to the plugin data folder
+  file: "badgerquest.db"

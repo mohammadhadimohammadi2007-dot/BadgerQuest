@@ -1,0 +1,41 @@
+# Build output
+target/
+build/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+!**/libs/*.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local config with secrets or per-machine paths
+*.local.yml
+*.local.yaml
+secrets.yml
+config.local.*
+
+# Logs
+*.log
+logs/
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Maven
+dependency-reduced-pom.xml
